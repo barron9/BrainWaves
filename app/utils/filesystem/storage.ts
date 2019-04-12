@@ -75,7 +75,7 @@ export const storeBehaviouralData = (
 };
 
 // Stores an image to workspace dir
-export const storeJupyterImage = (
+export const storePyodideImage = (
   title: string,
   imageTitle: string,
   rawData: Buffer
