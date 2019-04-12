@@ -19,7 +19,8 @@ export const imports = () =>
     "plt.style.use('fivethirtyeight')",
   ].join('\n');
 
-export const utils = () => readFileSync(path.join(__dirname, '/utils/jupyter/utils.py'), 'utf8');
+export const utils = () =>
+  readFileSync(path.join(__dirname, '/utils/pyodide/utils.py'), 'utf8');
 
 export const loadCSV = (filePathArray: Array<string>) =>
   [
@@ -80,8 +81,11 @@ export const plotTopoMap = () =>
 export const plotERP = (channelIndex: number) =>
   [
     `%matplotlib inline`,
+    `X, y = plot_conditions(clean_epochs, ch_ind=${channelIndex}, conditions=conditions`,
     `X, y = plot_conditions(clean_epochs, ch_ind=${channelIndex}, conditions=conditions,
     ci=97.5, n_boot=1000, title='', diff_waveform=None)`,
+    `X, y = plot_conditions(clean_epochs, ch_ind=${channelIndex}, conditions=conditions,
+    ci=97.5, n_boot=1000, title='', diff_waveform=None)`
   ].join('\n');
 
 export const saveEpochs = (workspaceDir: string, subject: string) =>
