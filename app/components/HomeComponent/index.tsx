@@ -40,8 +40,12 @@ import OverviewComponent from './OverviewComponent';
 import { loadProtocol } from '../../utils/labjs/functions';
 import EEGExplorationComponent from '../EEGExplorationComponent';
 import { SignalQualityData } from '../../constants/interfaces';
+import { languagePluginLoader } from '../../utils/pyodide/pyodide';
 
 const { dialog } = remote;
+
+// this initiates pyodide
+languagePluginLoader;
 
 const HOME_STEPS = {
   // TODO: maybe change the recent and new labels, but not necessary right now
