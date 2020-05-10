@@ -6,13 +6,7 @@ import { toast } from 'react-toastify';
 import * as moment from 'moment';
 
 import styles from '../styles/common.css';
-import {
-  EXPERIMENTS,
-  SCREENS,
-  KERNEL_STATUS,
-  CONNECTION_STATUS,
-  DEVICE_AVAILABILITY,
-} from '../../constants/constants';
+import { EXPERIMENTS, SCREENS } from '../../constants/constants';
 import faceHouseIcon from '../../assets/common/FacesHouses.png';
 import stroopIcon from '../../assets/common/Stroop.png';
 import multitaskingIcon from '../../assets/common/Multitasking.png';
@@ -30,12 +24,6 @@ import {
 import InputModal from '../InputModal';
 import SecondaryNavComponent from '../SecondaryNavComponent';
 import OverviewComponent from './OverviewComponent';
-import { loadProtocol } from '../../utils/labjs/functions';
-import EEGExplorationComponent from '../EEGExplorationComponent';
-
-import { remote } from 'electron';
-
-const { dialog } = remote;
 
 const HOME_STEPS = {
   // TODO: maybe change the recent and new labels, but not necessary right now
@@ -45,17 +33,11 @@ const HOME_STEPS = {
 };
 
 interface Props {
-  kernelStatus: KERNEL_STATUS;
   history: Object;
-  jupyterActions: Object;
-  connectedDevice: Object;
-  signalQualityObservable: ?any;
-  deviceType: DEVICES;
-  deviceAvailability: DEVICE_AVAILABILITY;
-  connectionStatus: CONNECTION_STATUS;
   deviceActions: Object;
   availableDevices: Array<any>;
   experimentActions: Object;
+  pyodideActions: Object;
 }
 
 interface State {
@@ -94,6 +76,7 @@ export default class Home extends Component<Props, State> {
   }
 
   componentDidMount() {
+    this.props.pyodideActions.launch();
     this.setState({ recentWorkspaces: readWorkspaces() });
   }
 

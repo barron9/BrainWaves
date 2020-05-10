@@ -1,18 +1,8 @@
-import { KERNEL_STATUS } from '../../constants/constants';
+// -------------------------------------------
+// Helper & utility functions
 
-export const parseSingleQuoteJSON = (string: string) => JSON.parse(string.replace(/'/g, '"'));
-
-export const parseKernelStatus = (msg: Object) => {
-  switch (msg['content']['execution_state']) {
-    case 'busy':
-      return KERNEL_STATUS.BUSY;
-    case 'idle':
-      return KERNEL_STATUS.IDLE;
-    case 'starting':
-    default:
-      return KERNEL_STATUS.STARTING;
-  }
-};
+export const parseSingleQuoteJSON = (string: string) =>
+  JSON.parse(string.replace(/'/g, '"'));
 
 export const debugParseMessage = (msg: Object) => {
   let content = '';
@@ -40,3 +30,6 @@ export const debugParseMessage = (msg: Object) => {
   }
   return `${msg.channel} ${content}`;
 };
+
+export const formatFilePath = (filePath: string) =>
+  `"${filePath.replace(/\\/g, '/')}"`;
