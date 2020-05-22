@@ -61,7 +61,7 @@ export default class Home extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      activeStep: HOME_STEPS.RECENT,
+      activeStep: this.props.activeStep || HOME_STEPS.RECENT,
       recentWorkspaces: [],
       isNewExperimentModalOpen: false,
       isOverviewComponentOpen: false,
@@ -117,6 +117,7 @@ export default class Home extends Component<Props, State> {
     this.props.experimentActions.createNewWorkspace({
       title,
       type: EXPERIMENTS.CUSTOM,
+      paradigm: EXPERIMENTS.CUSTOM,
     });
     this.props.history.push(SCREENS.DESIGN.route);
   }
@@ -194,21 +195,18 @@ export default class Home extends Component<Props, State> {
                             <Button
                               secondary
                               onClick={() => this.handleDeleteWorkspace(dir)}
-                              className={styles.experimentBtn}
                             >
                               Delete
                             </Button>
                             <Button
                               secondary
                               onClick={() => openWorkspaceDir(dir)}
-                              className={styles.experimentBtn}
                             >
                               Go to Folder
                             </Button>
                             <Button
                               primary
                               onClick={() => this.handleLoadRecentWorkspace(dir)}
-                              className={styles.experimentBtn}
                             >
                               Open Experiment
                             </Button>
@@ -346,6 +344,38 @@ export default class Home extends Component<Props, State> {
                 </Segment>
               </Grid.Column>
             </Grid.Row>
+
+
+            <Grid.Row>
+              <Grid.Column>
+                <Segment>
+                  <Grid
+                    columns='two'
+                    className={styles.experimentCard}
+                    onClick={() => this.handleNewExperiment(EXPERIMENTS.CUSTOM)}
+                  >
+                    <Grid.Row>
+                      <Grid.Column width={4} className={styles.experimentCardImage}>
+                        <Image src={customIcon} />
+                      </Grid.Column>
+                      <Grid.Column width={12} className={styles.descriptionContainer}>
+                        <Header as='h1' className={styles.experimentCardHeader}>
+                          Custom experiment
+                        </Header>
+                        <div className={styles.experimentCardDescription}>
+                          <p>
+                            Design your own experiment!
+                          </p>
+                        </div>
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                </Segment>
+              </Grid.Column>
+
+              <Grid.Column />
+            </Grid.Row>
+
           </Grid>
         );
       case HOME_STEPS.EXPLORE:

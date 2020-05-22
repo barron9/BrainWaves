@@ -11,6 +11,7 @@ export const EXPERIMENTS = {
 
 export const SCREENS = {
   HOME: { route: '/', title: 'HOME', order: 0 },
+  BANK: { route: '/home', title: 'HOME', order: 0 },
   DESIGN: { route: '/design', title: 'REVIEW DESIGN', order: 1 },
   COLLECT: { route: '/collect', title: 'COLLECT', order: 2 },
   RUN: { route: '/run', title: 'RUN', order: 5 },
@@ -54,6 +55,8 @@ export const SEARCH_TIMER = 3000;
 export const EVENTS = {
   STIMULUS_1: 1,
   STIMULUS_2: 2,
+  STIMULUS_3: 3,
+  STIMULUS_4: 4,
   TARGET: 2,
   NONTARGET: 1,
 };

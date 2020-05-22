@@ -23,10 +23,10 @@ export const buildMultiTimeline = () => ({
   background_second_column_question: `Do you think some people could be better brain ‘distributors’ than others?`,
   protocol_title: `What participants are shown`,
   protocol: `Participants are shown either a square or diamonds with dots inside.
-    The location of the object on the screen indicates which rule the participant needs to follow`,
+    The location of the object on the screen indicates which rule the participant needs to follow.`,
   protocol_condition_first_img: `multiConditionShape`,
   protocol_condition_first_title: `Rule 1`,
-  protocol_condition_first: `If the object is shown on top, they need to respond to the shape (pressing ‘n’ for square and ‘b’ for diamond).`,
+  protocol_condition_first: `If the object is shown on top, participants need to respond to the shape (pressing ‘n’ for square and ‘b’ for diamond).`,
   protocol_condition_second_img: `multiConditionDots`,
   protocol_condition_second_title: `Rule 2`,
   protocol_condition_second: `If the object is shown on the bottom, they need to respond to the number of dots inside (pressing ‘n’ for 3 dots and ‘b’ for 2 dots). `,
@@ -49,7 +49,6 @@ export const buildMultiTimeline = () => ({
     iti: 1000,
     jitter: 200,
     sampleType: 'with-replacement',
-    pluginName: 'callback-image-display',
     intro: `In this task you will learn about multitasking difficulties using a task mixing and switching paradigm. You will go through several instruction and training blocks and then several blocks of real data collection will follow. Press the space bar to continue with the instructions.`,
     showProgressBar: false,
     stimulus1: {

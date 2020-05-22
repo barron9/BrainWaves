@@ -78,7 +78,7 @@
 }
 
 .experimentTitleGridColumn {
-  white-space: nowrap;
+  /* white-space: nowrap; */
   display: flex !important;
   justify-content: center;
   height: inherit;
@@ -90,18 +90,16 @@
   border-width: 0px;
   border-bottom-width: 4px;
   border-bottom-color: #ffc107;
+  width: inherit;
 }
 
-.experimentTitleSegment {
+.homeButton {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  align-items: center;
   justify-content: center;
-  grid-column-gap: 10px;
+  margin-left: 20px !important;
 }
 
 .exitWorkspaceBtn{
-  display: grid;
   font-family: Gothic A1 !important;
   font-style: normal !important;
   font-weight: 900 !important;
@@ -109,7 +107,6 @@
   line-height: 30px !important;
   color: #007C70 !important;
   border: none !important;
-  height: 35px;
-  min-width: 35px;
-  margin-left: 10px !important;
+  height: 30px;
+  min-width: 30px;
 }

@@ -23,7 +23,7 @@
 }
 
 .contentGrid {
-  height: 95%;
+  height: 90%;
 }
 
 .overviewImage {
@@ -75,6 +75,8 @@
 .closeButton {
   border: none !important;
   box-shadow: none !important;
+  display: grid;
+  justify-content: end;
 }
 
 .previewWindow {
@@ -106,12 +108,16 @@
   height: 100%;
 }
 
-.helpSidebar {
-  height: inherit;
+.helpButton {
+  height: 44px !important;
+  width: 44px !important;
+  color: #fff !important;
+  background-color: #007c70 !important;
+  border-radius: 22px !important;
 }
 
-.helpSidebar i {
-  color: #64c9e2;
+.helpSidebar {
+  height: inherit;
 }
 
 .helpHeader {
@@ -126,18 +132,6 @@
 .helpContent {
   font-size: 18px !important;
   height: 80%;
-}
-
-.helpButton {
-  height: 44px !important;
-  width: 44px !important;
-  color: #fff !important;
-  background-color: #007c70 !important;
-  border-radius: 22px !important;
-  border: 2px solid #007c70 !important;
-  display: flex;
-  justify-content: flex-end;
-  font-size: initial !important;
 }
 
 .externalLinks {
@@ -357,8 +351,7 @@
   align-content: baseline;
   grid-template-columns: 1fr;
   overflow-y: scroll;
-  min-height: 500px;
-  max-height: 500px;
+  max-height: 50vh;
 }
 
 .EEGToggle {
@@ -369,9 +362,19 @@
   display: grid;
   grid-template-columns: auto auto 1fr;
   grid-column-gap: 10px;
+  border: 2px solid #cccccc;
+  padding: inherit;
+  border-radius: 4px;
+  width: fit-content;
 }
 
 .disconnectButtonContainer {
   display: flex;
   justify-content: flex-end;
+}
+
+.trialsTopInfoBar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-column-gap: 10px;
 }

@@ -1,7 +1,7 @@
 {
   "name": "BrainWaves",
   "productName": "BrainWaves",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "EEG Experiment Desktop Application",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -19,8 +19,10 @@
     "package-all": "npm run build && build -mwl",
     "package-linux": "npm run build && build --linux",
     "package-win": "npm run build && build --win --x64",
+    "package-mac": "npm run build && build --mac --x64",
     "postinstall": "node -r babel-register internals/scripts/CheckNativeDep.js && npm run build-dll && electron-builder install-app-deps && node node_modules/fbjs-scripts/node/check-dev-engines.js package.json && node -r babel-register internals/scripts/InstallPyodide.js",
-    "postlint-fix": "prettier --ignore-path .eslintignore --write '**/*.js'",
+    "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.js'",
+    "precommit": "lint-staged",
     "prestart": "npm run build",
     "start": "cross-env NODE_ENV=production electron ./app/",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./app/main.dev.js",
@@ -64,19 +66,9 @@
       "main.prod.js.map",
       "package.json"
     ],
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
+    "mac": {
+      "icon": "resources/icon.icns",
+      "target": "pkg"
     },
     "win": {
       "target": [
@@ -173,10 +165,10 @@
     "cross-spawn": "^6.0.5",
     "css-loader": "^0.28.11",
     "detect-port": "^1.2.3",
-    "electron-builder": "^20.15.1",
+    "electron": "^2.0.2",
+    "electron-builder": "^20.44.4",
     "electron-devtools-installer": "^2.2.4",
     "electron-rebuild": "^1.7.3",
-    "electron": "^2.0.2",
     "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.4",
     "enzyme": "^3.3.0",
@@ -197,7 +189,7 @@
     "eslint": "^6.8.0",
     "express": "^4.16.3",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "fbjs-scripts": "^0.8.3",
+    "fbjs-scripts": "^1.2.0",
     "file-loader": "^1.1.11",
     "flow-bin": "^0.72.0",
     "flow-runtime": "^0.17.0",
@@ -206,7 +198,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.0.0",
     "lint-staged": "^7.1.2",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.5",
     "node-gyp": "^6.0.1",
     "node-sass": "^4.13.1",
     "npm-logical-tree": "^1.2.1",
@@ -244,7 +236,8 @@
     "font-awesome": "^4.7.0",
     "hazardous": "^0.3.0",
     "history": "^4.7.2",
-    "jspsych-react": "^0.3.0",
+    "kernelspecs": "^2.0.0",
+    "lab.js": "^20.0.1",
     "lodash": "^4.17.15",
     "lodash.clonedeep": "^4.5.0",
     "mkdirp": "^0.5.1",
@@ -252,7 +245,7 @@
     "mousetrap": "^1.6.2",
     "muse-js": "^3.1.0",
     "papaparse": "^5.0.0",
-    "plotly.js": "^1.48.3",
+    "plotly.js": "^1.54.1",
     "rc-slider": "^8.6.3",
     "react": "^16.5.0",
     "react-dom": "^16.5.0",

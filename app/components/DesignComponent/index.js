@@ -25,8 +25,8 @@ import customOverview from '../../assets/common/Custom.png';
 // conditions images
 import multiConditionShape from '../../assets/multi/multiConditionShape.png';
 import multiConditionDots from '../../assets/multi/multiConditionDots.png';
-import conditionFace from '../../assets/face_house/faces/Annie_3.jpg';
-import conditionHouse from '../../assets/face_house/houses/house1.3.jpg';
+import conditionFace from '../../assets/face_house/faces/Face1.jpg';
+import conditionHouse from '../../assets/face_house/houses/House1.jpg';
 import conditionOrangeT from '../../assets/search/conditionOrangeT.png';
 import conditionNoOrangeT from '../../assets/search/conditionNoOrangeT.png';
 import conditionCongruent from '../../assets/stroop/match_g.png';
@@ -45,7 +45,6 @@ const DESIGN_STEPS = {
   PREVIEW: 'PREVIEW',
 };
 
-// TODO: Add all the labjs props (e.g. protocol_title) to this interface
 interface Props {
   history: Object;
   type: EXPERIMENTS;
@@ -128,7 +127,8 @@ export default class Design extends Component<Props, State> {
     this.props.experimentActions.createNewWorkspace({
       title,
       type: EXPERIMENTS.CUSTOM,
-      paradigm: this.props.paradigm,
+      paradigm: 'Custom',
+      // paradigm: this.props.paradigm
     });
     this.props.experimentActions.saveWorkspace();
   }
@@ -147,47 +147,60 @@ export default class Design extends Component<Props, State> {
     this.props.experimentActions.saveWorkspace();
   }
 
-  renderConditionIcon = (type) => {
+  renderConditionIcon(type) {
     switch (type) {
       case 'conditionCongruent':
         return conditionCongruent;
+        break;
       case 'conditionIncongruent':
         return conditionIncongruent;
+        break;
       case 'conditionOrangeT':
         return conditionOrangeT;
+        break;
       case 'conditionNoOrangeT':
         return conditionNoOrangeT;
+        break;
       case 'conditionFace':
         return conditionFace;
+        break;
       case 'conditionHouse':
         return conditionHouse;
+        break;
       case 'multiConditionShape':
         return multiConditionShape;
+        break;
       case 'multiConditionDots':
       default:
         return multiConditionDots;
+        break;
     }
-  };
+  }
 
-  renderOverviewIcon = (type) => {
+  renderOverviewIcon(type) {
     switch (type) {
       case EXPERIMENTS.N170:
         return facesHousesOverview;
+        break;
 
       case EXPERIMENTS.STROOP:
         return stroopOverview;
+        break;
 
       case EXPERIMENTS.MULTI:
         return multitaskingOverview;
+        break;
 
       case EXPERIMENTS.SEARCH:
         return searchOverview;
+        break;
 
       case EXPERIMENTS.CUSTOM:
       default:
         return customOverview;
+        break;
     }
-  };
+  }
 
   renderSectionContent() {
     switch (this.state.activeStep) {
@@ -211,7 +224,6 @@ export default class Design extends Component<Props, State> {
               <Grid.Column stretched width={11}>
                 <Segment basic>
                   <Header as='h1'>{this.props.overview_title}</Header>
-                  <Divider />
                   <p>{this.props.overview}</p>
                 </Segment>
               </Grid.Column>
@@ -282,7 +294,7 @@ export default class Design extends Component<Props, State> {
               <Grid.Column width={9}>
                 <Grid>
                   <Grid.Row>
-                    <Grid.Column width={3}>
+                    <Grid.Column width={5}>
                       <Image
                         src={this.renderConditionIcon(this.props.protocol_condition_first_img)}
                       />
@@ -296,7 +308,7 @@ export default class Design extends Component<Props, State> {
                   </Grid.Row>
 
                   <Grid.Row>
-                    <Grid.Column width={3}>
+                    <Grid.Column width={5}>
                       <Image
                         src={this.renderConditionIcon(this.props.protocol_condition_second_img)}
                       />

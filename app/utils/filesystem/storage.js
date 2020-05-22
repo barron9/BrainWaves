@@ -41,6 +41,21 @@ export const storeExperimentState = (state: ExperimentStateType) => {
   );
 };
 
+export const restoreExperimentState = (state: ExperimentStateType) => {
+  if(state.type !== 'NONE'){
+    const timestampedState = {
+      ...state,
+      subject: '',
+      group: '',
+      session: 1
+    };
+    fs.writeFileSync(
+      path.join(getWorkspaceDir(timestampedState.title), 'appState.json'),
+      JSON.stringify(timestampedState)
+    );
+  }
+}
+
 export const storeBehaviouralData = (
   csv: string,
   title: string,
@@ -165,6 +180,15 @@ export const readImages = (dir: string) =>
     );
   });
 
+// Returns an array of images that are used in a timeline for use in preloading
+export const getImages = (params: ExperimentParameters) =>
+  readdirSync(params.stimulus1.dir)
+    .map((filename) => path.join(params.stimulus1.dir, filename))
+    .concat(
+      readdirSync(params.stimulus2.dir).map((filename) => path.join(params.stimulus2.dir, filename))
+    );
+
+
 // -----------------------------------------------------------------------------------------------
 // Util
 
@@ -227,3 +251,10 @@ const convertObjectToSCV = (data) => {
 export const deleteWorkspaceDir = (title: string) => {
   shell.moveItemToTrash(path.join(workspaces, title));
 };
+
+// Check whether the file with the given name already exists in the filesystem
+export const checkFileExists = (title, subject, filename) => {
+  const file = path.join(getWorkspaceDir(title), 'Data', subject, 'Behavior', filename);
+  const fileExists = fs.existsSync(file);
+  return fileExists;
+}
