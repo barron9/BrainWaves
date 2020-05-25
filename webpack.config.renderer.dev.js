@@ -74,8 +74,7 @@ export default merge.smart(baseConfig, {
               // Here, we include babel plugins that are only required for the
               // renderer process. The 'transform-*' plugins must be included
               // before react-hot-loader/babel
-              'transform-class-properties',
-              'transform-es2015-classes',
+              '@babel/plugin-proposal-class-properties',
               'react-hot-loader/babel',
             ],
           },
@@ -262,8 +261,11 @@ export default merge.smart(baseConfig, {
     inline: true,
     lazy: false,
     hot: true,
-    headers: { "Access-Control-Allow-Origin": "*" },
-    contentBase: [path.join(__dirname, "app", "dist"), path.join(__dirname, "app", "utils", "pyodide")],
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    contentBase: [
+      path.join(__dirname, 'app', 'dist'),
+      path.join(__dirname, 'app', 'utils', 'pyodide'),
+    ],
     watchOptions: {
       aggregateTimeout: 300,
       ignored: /node_modules/,
@@ -273,7 +275,7 @@ export default merge.smart(baseConfig, {
       verbose: true,
       disableDotRule: false,
     },
-    before(app) {
+    before() {
       if (process.env.START_HOT) {
         console.log('Starting Main Process...');
         spawn('npm', ['run', 'start-main-dev'], {
