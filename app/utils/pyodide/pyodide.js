@@ -46,7 +46,7 @@ const languagePluginLoader = new Promise((resolve, reject) => {
       let dirs;
       try {
         dirs = FS.readdir(rootpath);
-      } catch {
+      } catch (e) {
         return;
       }
       for (let entry of dirs) {
@@ -435,3 +435,4 @@ const languagePluginLoader = new Promise((resolve, reject) => {
     });
   }
 });
+languagePluginLoader;
