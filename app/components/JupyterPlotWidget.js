@@ -16,8 +16,8 @@ interface State {
 }
 
 export default class PyodidePlotWidget extends Component<Props, State> {
-  props: Props;
-  state: State;
+  // props: Props;
+  // state: State;
   constructor(props: Props) {
     super(props);
     this.state = {

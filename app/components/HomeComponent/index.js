@@ -398,7 +398,7 @@ export default class Home extends Component<Props, State> {
       );
     }
     return (
-      <React.Fragment>
+      <>
         <SecondaryNavComponent
           title={<Image src={appLogo} />}
           steps={HOME_STEPS}
@@ -406,7 +406,7 @@ export default class Home extends Component<Props, State> {
           onStepClick={this.handleStepClick}
         />
         <div className={styles.homeContentContainer}>{this.renderSectionContent()}</div>
-      </React.Fragment>
+      </>
     );
   }
 
