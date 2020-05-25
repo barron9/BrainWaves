@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable';
-import { of, fromEvent } from 'rxjs';
+import { of } from 'rxjs';
 import { toast } from 'react-toastify';
-import { map, mergeMap, tap, pluck, filter } from 'rxjs/operators';
+import { map, mergeMap, tap, pluck, filter, ignoreElements } from 'rxjs/operators';
 import { getWorkspaceDir } from '../utils/filesystem/storage';
 import { parseSingleQuoteJSON } from '../utils/pyodide/functions';
 import { readFiles } from '../utils/filesystem/read';
@@ -13,13 +13,13 @@ import {
   LOAD_ERP,
   LOAD_TOPO,
   CLEAN_EPOCHS,
+  DEBUG,
   loadTopo,
   loadERP,
 } from '../actions/pyodideActions';
 import {
   loadPyodide,
   loadCSV,
-  loadCleanedEpochs,
   filterIIR,
   epochEvents,
   requestEpochsInfo,
@@ -29,6 +29,7 @@ import {
   plotERP,
   plotTopoMap,
   saveEpochs,
+  postPyodideMessage,
 } from '../utils/pyodide';
 import {
   EMOTIV_CHANNELS,
@@ -38,6 +39,7 @@ import {
   PYODIDE_VARIABLE_NAMES,
   PYODIDE_STATUS,
 } from '../constants/constants';
+import { fromEvent } from 'rxjs';
 
 export const GET_CHANNEL_INFO = 'GET_CHANNEL_INFO';
 export const GET_EPOCHS_INFO = 'GET_EPOCHS_INFO';
@@ -112,33 +114,42 @@ const receivePyodideMessage = (payload) => ({
 // Epics
 
 const launchEpic = (action$) =>
-  action$.ofType(LAUNCH).pipe(
-    tap(() => console.log('launching')),
-    map(loadPyodide),
-    map(setPyodideWorker)
-  );
+  action$.ofType(LAUNCH).pipe(map(loadPyodide), map(setPyodideWorker));
+
+const debugPyodide = (action$) =>
+  action$
+    .ofType(DEBUG)
+    .pipe(pluck('payload'), tap(console.log), tap(postPyodideMessage), ignoreElements());
 
 const pyodideError = (action$) =>
   action$.ofType(SET_PYODIDE_WORKER).pipe(
     pluck('payload'),
-    tap((e) =>
-      toast.error(`Error in pyodideWorker at ${e.filename}, Line: ${e.lineno}, ${e.message}`)
-    ),
-    map(receivePyodideError)
+    tap(console.log),
+    ignoreElements()
+    // mergeMap((worker: Worker) =>
+    //   fromEvent(worker.onerror).pipe(
+    //     tap((e) =>
+    //       toast.error(`Error in pyodideWorker at ${e.filename}, Line: ${e.lineno}, ${e.message}`)
+    //     ),
+    //     map(receivePyodideError)
+    //   )
+    // )
   );
 
 const pyodideMessage = (action$) =>
   action$.ofType(SET_PYODIDE_WORKER).pipe(
     pluck('payload'),
-    tap((e) => {
-      const { results, error } = e.data;
-      if (results && !error) {
-        toast(`Pyodide: `, results);
-      } else if (error) {
-        toast.error('Pyodide: ', error);
-      }
-    }),
-    map(receivePyodideMessage)
+    filter((payload) => payload),
+    ignoreElements()
+    // tap((e) => {
+    //   const { results, error } = e.data;
+    //   if (results && !error) {
+    //     toast(`Pyodide: `, results);
+    //   } else if (error) {
+    //     toast.error('Pyodide: ', error);
+    //   }
+    // }),
+    // map(receivePyodideMessage)
   );
 
 const loadEpochsEpic = (action$, state$) =>
@@ -169,7 +180,7 @@ const loadCleanedEpochsEpic = (action$) =>
   action$.ofType(LOAD_CLEANED_EPOCHS).pipe(
     pluck('payload'),
     filter((filePathsArray) => filePathsArray.length >= 1),
-    map((filePathsArray) => loadCleanedEpochs(filePathsArray)),
+    // map((filePathsArray) => loadCleanedEpochs(filePathsArray)),
     mergeMap(() =>
       of(getEpochsInfo(PYODIDE_VARIABLE_NAMES.CLEAN_EPOCHS), getChannelInfo(), loadTopo())
     )
@@ -225,7 +236,8 @@ const loadERPEpic = (action$) =>
     map((channelName) => {
       if (MUSE_CHANNELS.includes(channelName)) {
         return MUSE_CHANNELS.indexOf(channelName);
-      } else if (EMOTIV_CHANNELS.includes(channelName)) {
+      }
+      if (EMOTIV_CHANNELS.includes(channelName)) {
         return EMOTIV_CHANNELS.indexOf(channelName);
       }
       console.warn('channel name supplied to loadERPEpic does not belong to either device');
@@ -238,6 +250,7 @@ const loadERPEpic = (action$) =>
 export default combineEpics(
   pyodideError,
   pyodideMessage,
+  debugPyodide,
   launchEpic,
   loadEpochsEpic,
   loadCleanedEpochsEpic,

@@ -1,10 +1,10 @@
 /**
  * This file has been copied from pyodide source and modified to allow
- * pyodide to be used in a web worker within this
+ * pyodide to be used in a web worker within this app
  */
 
 self.languagePluginUrl = './src';
-importScripts('./pyodide.js');
+importScripts('./src/pyodide.js');
 
 const onmessage = function(e) {
   // eslint-disable-line no-unused-vars

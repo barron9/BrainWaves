@@ -1,12 +1,12 @@
 /**
  * The main bootstrap script for loading pyodide.
  */
-const port = process.env.PORT || 1212;
 
-export const languagePluginLoader = new Promise((resolve, reject) => {
-
-  var baseURL = 'http://localhost:' + port + '/src/';
-  // var baseURL = self.languagePluginUrl || 'https://iodide.io/pyodide-demo/';
+const languagePluginLoader = new Promise((resolve, reject) => {
+  // This is filled in by the Makefile to be either a local file or the
+  // deployed location. TODO: This should be done in a less hacky
+  // way.
+  var baseURL = self.languagePluginUrl || 'https://pyodide.cdn.iodide.io/';
   baseURL = baseURL.substr(0, baseURL.lastIndexOf('/')) + '/';
 
   ////////////////////////////////////////////////////////////
@@ -14,9 +14,8 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
   let loadedPackages = new Array();
   var loadPackagePromise = new Promise((resolve) => resolve());
   // Regexp for validating package name and URI
-  var package_name_regexp = '[a-z0-9_][a-z0-9_\-]*'
-  var package_uri_regexp =
-      new RegExp('^https?://.*?(' + package_name_regexp + ').js$', 'i');
+  var package_name_regexp = '[a-z0-9_][a-z0-9_-]*';
+  var package_uri_regexp = new RegExp('^https?://.*?(' + package_name_regexp + ').js$', 'i');
   var package_name_regexp = new RegExp('^' + package_name_regexp + '$', 'i');
 
   let _uri_to_package_name = (package_uri) => {
@@ -47,7 +46,7 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
       let dirs;
       try {
         dirs = FS.readdir(rootpath);
-      } catch (err) {
+      } catch {
         return;
       }
       for (let entry of dirs) {
@@ -58,8 +57,7 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
         if (entry.endsWith('.so')) {
           if (Module['preloadedWasm'][path] === undefined) {
             promise = promise
-              .then(() => Module['loadWebAssemblyModule'](
-                FS.readFile(path), {loadAsync: true}))
+              .then(() => Module['loadWebAssemblyModule'](FS.readFile(path), { loadAsync: true }))
               .then((module) => {
                 Module['preloadedWasm'][path] = module;
               });
@@ -73,21 +71,27 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
     recurseDir('/');
 
     return promise;
-  }
+  };
   // clang-format on
 
   function loadScript(url, onload, onerror) {
-    if (self.document) { // browser
+    if (self.document) {
+      // browser
       const script = self.document.createElement('script');
       script.src = url;
-      script.onload = (e) => { onload(); };
-      script.onerror = (e) => { onerror(); };
+      script.onload = (e) => {
+        onload();
+      };
+      script.onerror = (e) => {
+        onerror();
+      };
       self.document.head.appendChild(script);
-    } else if (self.importScripts) { // webworker
+    } else if (self.importScripts) {
+      // webworker
       try {
         self.importScripts(url);
         onload();
-      } catch (err) {
+      } catch {
         onerror();
       }
     }
@@ -102,54 +106,58 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
     while (queue.length) {
       let package_uri = queue.pop();
 
-      const packageName = _uri_to_package_name(package_uri);
+      const pkg = _uri_to_package_name(package_uri);
 
-      if (packageName == null) {
+      if (pkg == null) {
         console.error(`Invalid package name or URI '${package_uri}'`);
         return;
-      } else if (packageName == package_uri) {
+      } else if (pkg == package_uri) {
         package_uri = 'default channel';
       }
 
-      if (packageName in loadedPackages) {
-        if (package_uri != loadedPackages[packageName]) {
-          console.error(`URI mismatch, attempting to load package ` +
-                        `${packageName} from ${package_uri} while it is already ` +
-                        `loaded from ${loadedPackages[packageName]}!`);
+      if (pkg in loadedPackages) {
+        if (package_uri != loadedPackages[pkg]) {
+          console.error(
+            `URI mismatch, attempting to load package ` +
+              `${pkg} from ${package_uri} while it is already ` +
+              `loaded from ${loadedPackages[pkg]}!`
+          );
           return;
         }
-      } else if (packageName in toLoad) {
-        if (package_uri != toLoad[packageName]) {
-          console.error(`URI mismatch, attempting to load package ` +
-                        `${packageName} from ${package_uri} while it is already ` +
-                        `being loaded from ${toLoad[packageName]}!`);
+      } else if (pkg in toLoad) {
+        if (package_uri != toLoad[pkg]) {
+          console.error(
+            `URI mismatch, attempting to load package ` +
+              `${pkg} from ${package_uri} while it is already ` +
+              `being loaded from ${toLoad[pkg]}!`
+          );
           return;
         }
       } else {
-        console.log(`Loading ${packageName} from ${package_uri}`);
+        console.log(`Loading ${pkg} from ${package_uri}`);
 
-        toLoad[packageName] = package_uri;
-        if (packages.hasOwnProperty(packageName)) {
-          packages[packageName].forEach((subpackage) => {
+        toLoad[pkg] = package_uri;
+        if (packages.hasOwnProperty(pkg)) {
+          packages[pkg].forEach((subpackage) => {
             if (!(subpackage in loadedPackages) && !(subpackage in toLoad)) {
               queue.push(subpackage);
             }
           });
         } else {
-          console.error(`Unknown package '${packageName}'`);
+          console.error(`Unknown package '${pkg}'`);
         }
       }
     }
 
     self.pyodide._module.locateFile = (path) => {
       // handle packages loaded from custom URLs
-      let packageName = path.replace(/\.data$/, "");
-      if (packageName in toLoad) {
-        let package_uri = toLoad[packageName];
+      let pkg = path.replace(/\.data$/, '');
+      if (pkg in toLoad) {
+        let package_uri = toLoad[pkg];
         if (package_uri != 'default channel') {
-          return package_uri.replace(/\.js$/, ".data");
-        };
-      };
+          return package_uri.replace(/\.js$/, '.data');
+        }
+      }
       return baseURL + path;
     };
 
@@ -172,13 +180,15 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
       self.pyodide._module.monitorRunDependencies = () => {
         packageCounter--;
         if (packageCounter === 0) {
-          for (let packageName in toLoad) {
-            self.pyodide.loadedPackages[packageName] = toLoad[packageName];
+          for (let pkg in toLoad) {
+            self.pyodide.loadedPackages[pkg] = toLoad[pkg];
           }
           delete self.pyodide._module.monitorRunDependencies;
           self.removeEventListener('error', windowErrorHandler);
           if (!isFirefox) {
-            preloadWasm().then(() => {resolve(`Loaded ${packageList}`)});
+            preloadWasm().then(() => {
+              resolve(`Loaded ${packageList}`);
+            });
           } else {
             resolve(`Loaded ${packageList}`);
           }
@@ -196,34 +206,39 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
       };
       self.addEventListener('error', windowErrorHandler);
 
-      for (let packageName in toLoad) {
+      for (let pkg in toLoad) {
         let scriptSrc;
-        let package_uri = toLoad[packageName];
+        let package_uri = toLoad[pkg];
         if (package_uri == 'default channel') {
-          scriptSrc = `${baseURL}${packageName}.js`;
+          scriptSrc = `${baseURL}${pkg}.js`;
         } else {
           scriptSrc = `${package_uri}`;
         }
-        loadScript(scriptSrc, () => {}, () => {
-          // If the package_uri fails to load, call monitorRunDependencies twice
-          // (so packageCounter will still hit 0 and finish loading), and remove
-          // the package from toLoad so we don't mark it as loaded.
-          console.error(`Couldn't load package from URL ${scriptSrc}`)
-          let index = toLoad.indexOf(packageName);
-          if (index !== -1) {
-            toLoad.splice(index, 1);
+        loadScript(
+          scriptSrc,
+          () => {},
+          () => {
+            // If the package_uri fails to load, call monitorRunDependencies twice
+            // (so packageCounter will still hit 0 and finish loading), and remove
+            // the package from toLoad so we don't mark it as loaded.
+            console.error(`Couldn't load package from URL ${scriptSrc}`);
+            let index = toLoad.indexOf(pkg);
+            if (index !== -1) {
+              toLoad.splice(index, 1);
+            }
+            for (let i = 0; i < 2; i++) {
+              self.pyodide._module.monitorRunDependencies();
+            }
           }
-          for (let i = 0; i < 2; i++) {
-            self.pyodide._module.monitorRunDependencies();
-          }
-        });
+        );
       }
 
       // We have to invalidate Python's import caches, or it won't
       // see the new files. This is done here so it happens in parallel
       // with the fetching over the network.
-      self.pyodide.runPython('import importlib as _importlib\n' +
-                             '_importlib.invalidate_caches()\n');
+      self.pyodide.runPython(
+        'import importlib as _importlib\n' + '_importlib.invalidate_caches()\n'
+      );
     });
 
     return promise;
@@ -232,8 +247,7 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
   let loadPackage = (names, messageCallback) => {
     /* We want to make sure that only one loadPackage invocation runs at any
      * given time, so this creates a "chain" of promises. */
-    loadPackagePromise =
-        loadPackagePromise.then(() => _loadPackage(names, messageCallback));
+    loadPackagePromise = loadPackagePromise.then(() => _loadPackage(names, messageCallback));
     return loadPackagePromise;
   };
 
@@ -253,17 +267,14 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
     }
     try {
       recurse();
-    } catch (err) {
-      ;
-    }
+    } catch (err) {}
 
     let recursionLimit = depth / 50;
     if (recursionLimit > 1000) {
       recursionLimit = 1000;
     }
-    pyodide.runPython(
-        `import sys; sys.setrecursionlimit(int(${recursionLimit}))`);
-  };
+    pyodide.runPython(`import sys; sys.setrecursionlimit(int(${recursionLimit}))`);
+  }
 
   ////////////////////////////////////////////////////////////
   // Rearrange namespace for public API
@@ -277,10 +288,11 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
     'runPythonAsync',
     'checkABI',
     'version',
+    'autocomplete',
   ];
 
   function makePublicAPI(module, public_api) {
-    var namespace = {_module : module};
+    var namespace = { _module: module };
     for (let name of public_api) {
       namespace[name] = module[name];
     }
@@ -299,21 +311,34 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
   Module.preloadedWasm = {};
   let isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-  let wasm_promise = WebAssembly.compileStreaming(fetch(wasmURL));
+  let wasm_promise;
+  if (WebAssembly.compileStreaming === undefined) {
+    wasm_promise = fetch(wasmURL)
+      .then((response) => response.arrayBuffer())
+      .then((bytes) => WebAssembly.compile(bytes));
+  } else {
+    wasm_promise = WebAssembly.compileStreaming(fetch(wasmURL));
+  }
+
   Module.instantiateWasm = (info, receiveInstance) => {
-    wasm_promise.then(module => WebAssembly.instantiate(module, info))
-        .then(instance => receiveInstance(instance));
+    wasm_promise
+      .then((module) => WebAssembly.instantiate(module, info))
+      .then((instance) => receiveInstance(instance));
     return {};
   };
 
   Module.checkABI = function(ABI_number) {
     if (ABI_number !== parseInt('1')) {
-      var ABI_mismatch_exception =
-          `ABI numbers differ. Expected 1, got ${ABI_number}`;
+      var ABI_mismatch_exception = `ABI numbers differ. Expected 1, got ${ABI_number}`;
       console.error(ABI_mismatch_exception);
       throw ABI_mismatch_exception;
     }
     return true;
+  };
+
+  Module.autocomplete = function(path) {
+    var pyodide_module = Module.pyimport('pyodide');
+    return pyodide_module.get_completions(path);
   };
 
   Module.locateFile = (path) => baseURL + path;
@@ -321,40 +346,92 @@ export const languagePluginLoader = new Promise((resolve, reject) => {
     Module.postRun = () => {
       delete self.Module;
       fetch(`${baseURL}packages.json`)
-          .then((response) => response.json())
-          .then((json) => {
-            fixRecursionLimit(self.pyodide);
-            self.pyodide.globals =
-                self.pyodide.runPython('import sys\nsys.modules["__main__"]');
-            self.pyodide = makePublicAPI(self.pyodide, PUBLIC_API);
-            self.pyodide._module.packages = json;
-            resolve();
-          });
+        .then((response) => response.json())
+        .then((json) => {
+          fixRecursionLimit(self.pyodide);
+          self.pyodide.globals = self.pyodide.runPython('import sys\nsys.modules["__main__"]');
+          self.pyodide = makePublicAPI(self.pyodide, PUBLIC_API);
+          self.pyodide._module.packages = json;
+          if (self.iodide !== undefined) {
+            // Perform some completions immediately so there isn't a delay on
+            // the first call to autocomplete
+            self.pyodide.runPython('import pyodide');
+            self.pyodide.runPython('pyodide.get_completions("")');
+          }
+          resolve();
+        });
     };
   });
 
   var dataLoadPromise = new Promise((resolve, reject) => {
-    Module.monitorRunDependencies =
-        (n) => {
-          if (n === 0) {
-            delete Module.monitorRunDependencies;
-            resolve();
-          }
-        }
+    Module.monitorRunDependencies = (n) => {
+      if (n === 0) {
+        delete Module.monitorRunDependencies;
+        resolve();
+      }
+    };
   });
 
-  Promise.all([ postRunPromise, dataLoadPromise ]).then(() => resolve());
+  Promise.all([postRunPromise, dataLoadPromise]).then(() => resolve());
 
   const data_script_src = `${baseURL}pyodide.asm.data.js`;
-  loadScript(data_script_src, () => {
-    const scriptSrc = `${baseURL}pyodide.asm.js`;
-    loadScript(scriptSrc, () => {
-      // The emscripten module needs to be at this location for the core
-      // filesystem to install itself. Once that's complete, it will be replaced
-      // by the call to `makePublicAPI` with a more limited public API.
-      self.pyodide = pyodide(Module);
-      self.pyodide.loadedPackages = new Array();
-      self.pyodide.loadPackage = loadPackage;
-    }, () => {});
-  }, () => {});
+  loadScript(
+    data_script_src,
+    () => {
+      const scriptSrc = `${baseURL}pyodide.asm.js`;
+      loadScript(
+        scriptSrc,
+        () => {
+          // The emscripten module needs to be at this location for the core
+          // filesystem to install itself. Once that's complete, it will be replaced
+          // by the call to `makePublicAPI` with a more limited public API.
+          self.pyodide = pyodide(Module);
+          self.pyodide.loadedPackages = new Array();
+          self.pyodide.loadPackage = loadPackage;
+        },
+        () => {}
+      );
+    },
+    () => {}
+  );
+
+  ////////////////////////////////////////////////////////////
+  // Iodide-specific functionality, that doesn't make sense
+  // if not using with Iodide.
+  if (self.iodide !== undefined) {
+    // Load the custom CSS for Pyodide
+    let link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = `${baseURL}renderedhtml.css`;
+    document.getElementsByTagName('head')[0].appendChild(link);
+
+    // Add a custom output handler for Python objects
+    self.iodide.addOutputRenderer({
+      shouldRender: (val) => {
+        return typeof val === 'function' && pyodide._module.PyProxy.isPyProxy(val);
+      },
+
+      render: (val) => {
+        let div = document.createElement('div');
+        div.className = 'rendered_html';
+        var element;
+        if (val._repr_html_ !== undefined) {
+          let result = val._repr_html_();
+          if (typeof result === 'string') {
+            div.appendChild(new DOMParser().parseFromString(result, 'text/html').body.firstChild);
+            element = div;
+          } else {
+            element = result;
+          }
+        } else {
+          let pre = document.createElement('pre');
+          pre.textContent = val.toString();
+          div.appendChild(pre);
+          element = div;
+        }
+        return element.outerHTML;
+      },
+    });
+  }
 });

@@ -1,23 +1,22 @@
 // -------------------------------------------------------------------------
 // Action Types
 
-export const LAUNCH = "LAUNCH";
-export const SEND_EXECUTE_REQUEST = "SEND_EXECUTE_REQUEST";
-export const LOAD_EPOCHS = "LOAD_EPOCHS";
-export const LOAD_CLEANED_EPOCHS = "LOAD_CLEANED_EPOCHS";
-export const LOAD_PSD = "LOAD_PSD";
-export const LOAD_ERP = "LOAD_ERP";
-export const LOAD_TOPO = "LOAD_TOPO";
-export const CLEAN_EPOCHS = "CLEAN_EPOCHS";
+export const LAUNCH = 'LAUNCH';
+export const SEND_EXECUTE_REQUEST = 'SEND_EXECUTE_REQUEST';
+export const LOAD_EPOCHS = 'LOAD_EPOCHS';
+export const LOAD_CLEANED_EPOCHS = 'LOAD_CLEANED_EPOCHS';
+export const LOAD_PSD = 'LOAD_PSD';
+export const LOAD_ERP = 'LOAD_ERP';
+export const LOAD_TOPO = 'LOAD_TOPO';
+export const CLEAN_EPOCHS = 'CLEAN_EPOCHS';
+export const DEBUG = 'DEBUG';
 
 // -------------------------------------------------------------------------
 // Actions
 
-
 export const launch = () => ({
-  type: LAUNCH
+  type: LAUNCH,
 });
-
 
 export const sendExecuteRequest = (payload: string) => ({
   payload,
@@ -48,3 +47,5 @@ export const loadTopo = () => ({
 });
 
 export const cleanEpochs = () => ({ type: CLEAN_EPOCHS });
+
+export const debug = (payload: string) => ({ payload, type: DEBUG });

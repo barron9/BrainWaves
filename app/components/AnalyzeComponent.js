@@ -51,7 +51,6 @@ interface Props {
   isEEGEnabled: boolean;
   kernel: ?Kernel;
   kernelStatus: KERNEL_STATUS;
-  mainChannel: ?any;
   epochsInfo: ?Array<{ [string]: number | string }>;
   channelInfo: ?Array<string>;
   psdPlot: ?{ [string]: string };
@@ -298,9 +297,11 @@ export default class Analyze extends Component<Props, State> {
 
   renderEpochLabels() {
     if (!isNil(this.props.epochsInfo) && this.state.selectedFilePaths.length >= 1) {
-      const numberConditions = (this.props.epochsInfo.filter( infoObj => (infoObj.name !== 'Drop Percentage' && infoObj.name !== 'Total Epochs'))).length;
+      const numberConditions = this.props.epochsInfo.filter(
+        (infoObj) => infoObj.name !== 'Drop Percentage' && infoObj.name !== 'Total Epochs'
+      ).length;
       let colors;
-      if(numberConditions === 4){
+      if (numberConditions === 4) {
         colors = ['red', 'yellow', 'green', 'blue'];
       } else {
         colors = ['red', 'green', 'teal', 'orange'];
@@ -308,11 +309,13 @@ export default class Analyze extends Component<Props, State> {
       return (
         <div>
           {this.props.epochsInfo
-            .filter( infoObj => (infoObj.name !== 'Drop Percentage' && infoObj.name !== 'Total Epochs'))
+            .filter(
+              (infoObj) => infoObj.name !== 'Drop Percentage' && infoObj.name !== 'Total Epochs'
+            )
             .map((infoObj, index) => (
               <React.Fragment key={infoObj.name}>
-                <Header as="h4">{infoObj.name}</Header>
-                <Icon name="circle" color={colors[index]} />
+                <Header as='h4'>{infoObj.name}</Header>
+                <Icon name='circle' color={colors[index]} />
                 {infoObj.value}
               </React.Fragment>
             ))}
@@ -481,7 +484,7 @@ export default class Analyze extends Component<Props, State> {
                 />
                 <p />
                 <Divider hidden />
-                <span className="ui header">Dependent Variable</span>
+                <span className='ui header'>Dependent Variable</span>
                 <p />
                 <Dropdown
                   fluid
@@ -493,13 +496,21 @@ export default class Analyze extends Component<Props, State> {
                 />
               </Segment>
             </Grid.Column>
-            <Grid.Column width={12} style={{ overflow: 'auto', maxHeight: 650, display: 'grid', justifyContent: 'center' }}>
+            <Grid.Column
+              width={12}
+              style={{
+                overflow: 'auto',
+                maxHeight: 650,
+                display: 'grid',
+                justifyContent: 'center',
+              }}
+            >
               <Segment basic textAlign='left' className={styles.plotSegment}>
                 <Plot data={this.state.dataToPlot} layout={this.state.layout} />
                 <p />
                 <Checkbox
                   checked={this.state.removeOutliers}
-                  label="Remove Response Time Outliers"
+                  label='Remove Response Time Outliers'
                   onChange={this.handleRemoveOutliers}
                 />
 

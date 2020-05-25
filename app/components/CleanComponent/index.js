@@ -23,7 +23,6 @@ interface Props {
   type: ?EXPERIMENTS;
   title: string;
   deviceType: DEVICES;
-  mainChannel: ?any;
   epochsInfo: ?Array<{ [string]: number | string }>;
   pyodideActions: Object;
   experimentActions: Object;
@@ -195,10 +194,7 @@ export default class Clean extends Component<Props, State> {
                   <Divider hidden section />
                   <Grid textAlign='center' columns='equal'>
                     <Grid.Column>
-                      <Button
-                        secondary
-                        onClick={this.handleLoadData}
-                      >
+                      <Button secondary onClick={this.handleLoadData}>
                         Load Dataset
                       </Button>
                     </Grid.Column>

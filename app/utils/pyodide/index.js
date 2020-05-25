@@ -1,17 +1,16 @@
 import * as path from 'path';
 import { readFileSync } from 'fs';
-import { languagePluginLoader } from './pyodide';
 import { formatFilePath } from './functions';
 
 // ---------------------------------
 // This file contains the JS functions that allow the app to access python-wasm through pyodide
 // These functions wrap the python strings defined in the
 
-
 // -----------------------------
 // Imports and Utility functions
 
 export const loadPyodide = () => {
+  console.log('load pyodide');
   return new Worker('./utils/pyodide/webworker.js');
 };
 
@@ -101,3 +100,10 @@ export const saveEpochs = (workspaceDir: string, subject: string) =>
       path.join(workspaceDir, 'Data', subject, 'EEG', `${subject}-cleaned-epo.fif`)
     )}`,
   });
+
+// -----------------------------
+// Debug functions
+
+export const postPyodideMessage = async (payload: string) => {
+  pyodideWorker.postMessage({ data: payload });
+};

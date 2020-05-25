@@ -61,6 +61,9 @@ app.on('ready', async () => {
     show: false,
     width: 1280,
     height: 800,
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
 
   mainWindow.setMinimumSize(1075, 708);
