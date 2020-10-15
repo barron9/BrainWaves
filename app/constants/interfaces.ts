@@ -101,16 +101,6 @@ export interface StimuliDesc {
 }
 
 // --------------------------------------------------------------------
-// Jupyter
-
-export interface Kernel {
-  config: Record<string, any>;
-  connectionFile: string;
-  kernelSpec: Record<string, any>;
-  spawn: ChildProcess;
-}
-
-// --------------------------------------------------------------------
 // Device
 
 // For unconnected available devices
